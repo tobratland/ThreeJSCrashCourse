@@ -1,6 +1,9 @@
 let scene, camera, renderer, mesh;
 let meshFloor;
 let USE_WIREFRAME = false;
+
+let crate, crateTexture, crateNormalMap, crateBumpMap;
+
 let keyboard = {}; //creates a keyboard object
 
 let player = { //player object
@@ -23,7 +26,7 @@ function init(){
     scene.add(mesh); //adds the item created to the scene
 
     meshFloor = new THREE.Mesh( //creates floor 
-        new THREE.PlaneGeometry(10,10,10,10), // width, height, widthSegments, heightsegments
+        new THREE.PlaneGeometry(20,20 ,10,10), // width, height, widthSegments, heightsegments
         new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME})
     );
     meshFloor.rotation.x -= Math.PI / 2; //rotates the floor so it actually is on the floor
@@ -40,6 +43,25 @@ function init(){
     light.shadow.camera.far = 25; //furthest distance for shadows to appear
     scene.add(light); //adds the light item to the scene
 
+    
+    let textureLoader = new THREE.TextureLoader(); //sets textureloader
+    crateTexture = textureLoader.load("../textures/crate/crate2_diffuse.png") // loads the texture for the crate
+    crateBumpMap = textureLoader.load("../textures/crate/crate2_bump.png") //loads the bumpmap for the crate
+    crateNormalMap = textureLoader.load("../textures/crate/crate2_normal.png") //loads the normal map
+
+    crate = new THREE.Mesh( //creates a new box
+        new THREE.BoxGeometry(3,3,3), //defines the width, height and depth of the box
+        new THREE.MeshPhongMaterial({ //defines material
+            color: 0xffffff, //defines color
+            map: crateTexture, // defines texture
+            bumpMap: crateBumpMap, //defines the bumpmap for the crate
+            normalMap: crateNormalMap, //defines the normalMap for the crate
+        }) 
+    );
+    scene.add(crate) //adds the crate to the scene.
+    crate.position.set(2.5, 3/2, 2.5); //Positions the crate in the scene. 
+    crate.receiveShadow = true;
+    crate.castShadow = true;
     camera.position.set(0,player.height,-5); //sets the cameraposition
     camera.lookAt(new THREE.Vector3(0,player.height,0)); //sets the direction the camera is pointed
     
@@ -59,6 +81,7 @@ function animate(){
 
     mesh.rotation.x +=0.01;
     mesh.rotation.y +=0.02;
+    crate.rotation.y += 0.01;
 
     if(keyboard[87]) {  //W key, Forward movement
         camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
@@ -87,6 +110,7 @@ function animate(){
     if(keyboard[39]){   //right arrow key, look right
         camera.rotation.y += player.turnSpeed;
     }
+
 
     renderer.render(scene,camera)
 }
