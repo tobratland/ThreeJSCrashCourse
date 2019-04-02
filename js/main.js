@@ -62,6 +62,31 @@ function init(){
     crate.position.set(2.5, 3/2, 2.5); //Positions the crate in the scene. 
     crate.receiveShadow = true;
     crate.castShadow = true;
+    
+    let mtlLoader = new THREE.MTLLoader(); //defines the materialsloader
+    mtlLoader.load("models/tent_detailedOpen.mtl", function(materials){ //loads the tent_detailedOpen materials
+        materials.preload(); //preloads the materials that are given
+        let objLoader = new THREE.OBJLoader(); //Defines the objectloader
+        objLoader.setMaterials(materials); //sets the materials of the object
+
+        objLoader.load("models/tent_detailedOpen.obj", function(mesh){ //loads the tent_detailedOpen object (had to remove usemap lines in the model )
+            
+            mesh.traverse(function(node){ //traverses through the model and adds shadow to the individual pieces of the model
+                if( node instanceof THREE.Mesh) {
+                    node.castShadow = true;
+                    node.receiveShadow = true;
+                }
+            });
+            
+            scene.add(mesh); //Adds the mesh to the scene
+            mesh.scale.set(0.7,0.7,0.7) //gets the tent down to a reasonable size
+            mesh.position.set(-3, 0, 4); //positions the tent  
+            mesh.rotation.y = -Math.PI/4; //rotates the tent
+        });
+    });
+    
+    
+    
     camera.position.set(0,player.height,-5); //sets the cameraposition
     camera.lookAt(new THREE.Vector3(0,player.height,0)); //sets the direction the camera is pointed
     
